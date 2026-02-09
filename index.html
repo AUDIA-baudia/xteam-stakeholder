@@ -159,6 +159,8 @@
         .form-success { display: none; text-align: center; padding: 2rem; }
         .form-success .checkmark { font-size: 3rem; margin-bottom: 1rem; }
         .form-success h3 { font-family: 'Playfair Display', serif; color: var(--white); font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .consent-label { display: flex; gap: 0.75rem; align-items: flex-start; cursor: pointer; font-size: 0.85rem; color: var(--slate-400); line-height: 1.6; }
+        .consent-label input[type="checkbox"] { margin-top: 0.3rem; min-width: 18px; min-height: 18px; accent-color: var(--magenta); cursor: pointer; }
 
         .qr-section { text-align: center; display: flex; flex-direction: column; align-items: center; }
         .qr-row { display: flex; gap: 4rem; justify-content: center; align-items: flex-start; flex-wrap: wrap; margin-top: 2.5rem; }
@@ -167,6 +169,9 @@
         .qr-container canvas { display: block; }
         .qr-label-title { font-weight: 600; font-size: 0.92rem; color: var(--white); margin-top: 1rem; margin-bottom: 0.25rem; }
         .qr-label { font-size: 0.82rem; color: var(--slate-400); font-weight: 500; }
+        .qr-divider { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 0 1rem; }
+        .qr-divider-line { width: 1px; height: 50px; background: linear-gradient(180deg, transparent, rgba(249,168,37,0.4), transparent); }
+        .qr-divider-text { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--slate-400); white-space: nowrap; writing-mode: vertical-lr; text-orientation: mixed; transform: rotate(180deg); }
 
         footer { position: relative; z-index: 1; text-align: center; padding: 3rem; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.82rem; color: var(--slate-400); }
         footer a { color: var(--magenta); text-decoration: none; }
@@ -194,6 +199,9 @@
             .nav-links { display: none; }
             .featured-container { padding: 2rem 1.5rem; }
             .qr-row { gap: 2.5rem; }
+            .qr-divider { flex-direction: row; padding: 0.5rem 0; }
+            .qr-divider-line { width: 50px; height: 1px; }
+            .qr-divider-text { writing-mode: horizontal-tb; transform: none; }
         }
     </style>
 </head>
@@ -559,6 +567,7 @@
 
     <div class="form-container fade-in delay-3" style="margin-top:3rem;">
         <form id="interestForm">
+            <input type="hidden" name="form_type" value="X-Team Stakeholder Interest">
             <div class="form-grid">
                 <div class="form-group">
                     <label>First Name <span class="required">*</span></label>
@@ -600,6 +609,12 @@
                     <label>Questions or Comments</label>
                     <textarea name="comments" class="form-input" rows="3" style="resize:vertical;"></textarea>
                 </div>
+                <div class="form-group full-width" style="margin-top:0.5rem;">
+                    <label class="consent-label">
+                        <input type="checkbox" name="consent" value="yes" required>
+                        <span>I agree to receive communications from AUDIA Consulting via email, phone, or text message regarding this inquiry and related services. Message and data rates may apply. You may opt out at any time by replying STOP or contacting us directly.</span>
+                    </label>
+                </div>
             </div>
             <button type="submit" class="form-submit" id="submitBtn">Submit Interest</button>
         </form>
@@ -620,12 +635,17 @@
     <p class="section-body fade-in delay-2" style="text-align:center;">Share these resources with colleagues and stakeholders.</p>
     <div class="qr-row fade-in delay-3">
         <div class="qr-item">
-            <div class="qr-container"><canvas id="qrStakeholder"></canvas></div>
+            <div class="qr-container"><img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https%3A%2F%2Faudia-baudia.github.io%2Fxteam-stakeholder%2F&color=0D0D0D&bgcolor=FFFFFF&margin=0" alt="Stakeholder Model QR" width="220" height="220" style="display:block;"></div>
             <div class="qr-label-title">The Stakeholder Model</div>
             <div class="qr-label">This Presentation</div>
         </div>
+        <div class="qr-divider">
+            <div class="qr-divider-line"></div>
+            <div class="qr-divider-text"><span class="gold-text">X-Team</span> Value Offerings</div>
+            <div class="qr-divider-line"></div>
+        </div>
         <div class="qr-item">
-            <div class="qr-container"><canvas id="qrXTeamPI"></canvas></div>
+            <div class="qr-container"><img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https%3A%2F%2Faudia-baudia.github.io%2Fxteam-project%2F&color=0D0D0D&bgcolor=FFFFFF&margin=0" alt="X-Team PI Collective QR" width="220" height="220" style="display:block;"></div>
             <div class="qr-label-title"><span class="gold-text">X-Team</span> PI Collective</div>
             <div class="qr-label">Talent Optimization Details</div>
         </div>
@@ -637,16 +657,7 @@
     <span class="gold-text" style="white-space:nowrap;">X-Team</span> Collective · Powered by <a href="https://goaudia.com" target="_blank">AUDIA Consulting</a>
 </footer>
 
-<!-- ── QR CODE LIBRARY ── -->
-<script>
-(function(){
-    const QRCode=(function(){const PAD0=0xEC,PAD1=0x11;function QR(t,e){this.typeNumber=t;this.errorCorrectionLevel=e;this.modules=null;this.moduleCount=0;this.dataCache=null;this.dataList=[];}QR.prototype={addData:function(d){this.dataList.push({mode:4,data:d});this.dataCache=null;},getModuleCount:function(){return this.moduleCount;},make:function(){this.makeImpl(false,this.getBestMaskPattern());},isDark:function(r,c){return this.modules[r][c];},makeImpl:function(test,mp){this.moduleCount=this.typeNumber*4+17;this.modules=new Array(this.moduleCount);for(var r=0;r<this.moduleCount;r++){this.modules[r]=new Array(this.moduleCount);for(var c=0;c<this.moduleCount;c++)this.modules[r][c]=null;}this.setupPositionProbePattern(0,0);this.setupPositionProbePattern(this.moduleCount-7,0);this.setupPositionProbePattern(0,this.moduleCount-7);this.setupPositionAdjustPattern();this.setupTimingPattern();this.setupTypeInfo(test,mp);if(this.typeNumber>=7)this.setupTypeNumber(test);if(this.dataCache==null)this.dataCache=this.createData(this.typeNumber,this.errorCorrectionLevel,this.dataList);this.mapData(this.dataCache,mp);},setupPositionProbePattern:function(row,col){for(var r=-1;r<=7;r++){if(row+r<=-1||this.moduleCount<=row+r)continue;for(var c=-1;c<=7;c++){if(col+c<=-1||this.moduleCount<=col+c)continue;if((0<=r&&r<=6&&(c==0||c==6))||(0<=c&&c<=6&&(r==0||r==6))||(2<=r&&r<=4&&2<=c&&c<=4))this.modules[row+r][col+c]=true;else this.modules[row+r][col+c]=false;}}},getBestMaskPattern:function(){var min=0,pat=0;for(var i=0;i<8;i++){this.makeImpl(true,i);var lp=this.getLostPoint();if(i==0||min>lp){min=lp;pat=i;}}return pat;},getLostPoint:function(){return 0;},setupTimingPattern:function(){for(var r=8;r<this.moduleCount-8;r++){if(this.modules[r][6]!=null)continue;this.modules[r][6]=(r%2==0);}for(var c=8;c<this.moduleCount-8;c++){if(this.modules[6][c]!=null)continue;this.modules[6][c]=(c%2==0);}},setupPositionAdjustPattern:function(){var pos=this.getPatternPosition(this.typeNumber);for(var i=0;i<pos.length;i++)for(var j=0;j<pos.length;j++){var row=pos[i],col=pos[j];if(this.modules[row][col]!=null)continue;for(var r=-2;r<=2;r++)for(var c=-2;c<=2;c++){if(r==-2||r==2||c==-2||c==2||(r==0&&c==0))this.modules[row+r][col+c]=true;else this.modules[row+r][col+c]=false;}}},getPatternPosition:function(t){var T=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]];return T[t-1];},setupTypeNumber:function(test){var bits=this.getBCHTypeNumber(this.typeNumber);for(var i=0;i<18;i++){var mod=(!test&&((bits>>i)&1)==1);this.modules[Math.floor(i/3)][i%3+this.moduleCount-8-3]=mod;}for(var i=0;i<18;i++){var mod=(!test&&((bits>>i)&1)==1);this.modules[i%3+this.moduleCount-8-3][Math.floor(i/3)]=mod;}},getBCHTypeNumber:function(d){var v=d<<12;while(this.getBCHDigit(v)-this.getBCHDigit(0x1f25)>=0)v^=(0x1f25<<(this.getBCHDigit(v)-this.getBCHDigit(0x1f25)));return(d<<12)|v;},getBCHDigit:function(d){var g=0;while(d!=0){g++;d>>>=1;}return g;},setupTypeInfo:function(test,mp){var data=(1<<3)|mp;var bits=this.getBCHTypeInfo(data);for(var i=0;i<15;i++){var mod=(!test&&((bits>>i)&1)==1);if(i<6)this.modules[i][8]=mod;else if(i<8)this.modules[i+1][8]=mod;else this.modules[this.moduleCount-15+i][8]=mod;}for(var i=0;i<15;i++){var mod=(!test&&((bits>>i)&1)==1);if(i<8)this.modules[8][this.moduleCount-i-1]=mod;else if(i<9)this.modules[8][15-i-1+1]=mod;else this.modules[8][15-i-1]=mod;}this.modules[this.moduleCount-8][8]=(!test);},getBCHTypeInfo:function(d){var v=d<<10;while(this.getBCHDigit(v)-this.getBCHDigit(0x537)>=0)v^=(0x537<<(this.getBCHDigit(v)-this.getBCHDigit(0x537)));return((d<<10)|v)^0x5412;},mapData:function(data,mp){var inc=-1,row=this.moduleCount-1,bi=7,by=0;for(var col=this.moduleCount-1;col>0;col-=2){if(col==6)col--;while(true){for(var c=0;c<2;c++){if(this.modules[row][col-c]==null){var dark=false;if(by<data.length)dark=(((data[by]>>>bi)&1)==1);var mask=this.getMask(mp,row,col-c);if(mask)dark=!dark;this.modules[row][col-c]=dark;bi--;if(bi==-1){by++;bi=7;}}}row+=inc;if(row<0||this.moduleCount<=row){row-=inc;inc=-inc;break;}}}},getMask:function(m,i,j){switch(m){case 0:return(i+j)%2==0;case 1:return i%2==0;case 2:return j%3==0;case 3:return(i+j)%3==0;case 4:return(Math.floor(i/2)+Math.floor(j/3))%2==0;case 5:return(i*j)%2+(i*j)%3==0;case 6:return((i*j)%2+(i*j)%3)%2==0;case 7:return((i*j)%3+(i+j)%2)%2==0;}},createData:function(tn,ecl,dl){var rsB=this.getRSBlocks(tn,ecl);var buf={buffer:[],length:0,put:function(n,l){for(var i=0;i<l;i++){this.buffer[Math.floor(this.length/8)]=this.buffer[Math.floor(this.length/8)]||0;if(((n>>>(l-i-1))&1)==1)this.buffer[Math.floor(this.length/8)]|=(0x80>>>(this.length%8));this.length++;}},getLengthInBits:function(){return this.length;}};for(var i=0;i<dl.length;i++){var d=dl[i];buf.put(d.mode,4);buf.put(d.data.length,this.getLengthInBits(d.mode,tn));for(var j=0;j<d.data.length;j++)buf.put(d.data.charCodeAt(j),8);}var tdc=0;for(var i=0;i<rsB.length;i++)tdc+=rsB[i].dataCount;if(buf.getLengthInBits()>tdc*8)throw new Error('overflow');if(buf.getLengthInBits()+4<=tdc*8)buf.put(0,4);while(buf.getLengthInBits()%8!=0)buf.put(0,1);while(true){if(buf.getLengthInBits()>=tdc*8)break;buf.put(PAD0,8);if(buf.getLengthInBits()>=tdc*8)break;buf.put(PAD1,8);}return this.createBytes(buf,rsB);},getLengthInBits:function(m,t){if(1<=t&&t<10)return 8;else return 16;},getRSBlocks:function(t,e){var T=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16]];var r=T[(t-1)*4+e],list=[];for(var i=0;i<r.length;i+=3){var cnt=r[i],tc=r[i+1],dc=r[i+2];for(var j=0;j<cnt;j++)list.push({totalCount:tc,dataCount:dc});}return list;},createBytes:function(buf,rsB){var off=0,mxD=0,mxE=0,dcd=new Array(rsB.length),ecd=new Array(rsB.length);for(var r=0;r<rsB.length;r++){var dc=rsB[r].dataCount,ec=rsB[r].totalCount-dc;mxD=Math.max(mxD,dc);mxE=Math.max(mxE,ec);dcd[r]=new Array(dc);for(var i=0;i<dcd[r].length;i++)dcd[r][i]=0xff&buf.buffer[i+off];off+=dc;var rp=this.getErrorCorrectPolynomial(ec);var raw={num:new Array(dcd[r].length+rp.num.length-1)};for(var i=0;i<raw.num.length;i++)raw.num[i]=0;for(var i=0;i<dcd[r].length;i++)raw.num[i]=dcd[r][i];var mp=this.polyMod(raw,rp);ecd[r]=new Array(rp.num.length-1);for(var i=0;i<ecd[r].length;i++){var mi=i+mp.num.length-ecd[r].length;ecd[r][i]=(mi>=0)?mp.num[mi]:0;}}var tot=0;for(var i=0;i<rsB.length;i++)tot+=rsB[i].totalCount;var data=new Array(tot),idx=0;for(var i=0;i<mxD;i++)for(var r=0;r<rsB.length;r++)if(i<dcd[r].length)data[idx++]=dcd[r][i];for(var i=0;i<mxE;i++)for(var r=0;r<rsB.length;r++)if(i<ecd[r].length)data[idx++]=ecd[r][i];return data;},getErrorCorrectPolynomial:function(l){var a={num:[1]};for(var i=0;i<l;i++)a=this.polyMultiply(a,{num:[1,this.gexp(i)]});return a;},polyMod:function(a,b){if(a.num.length-b.num.length<0)return a;var n=new Array(a.num.length);for(var i=0;i<a.num.length;i++)n[i]=a.num[i];var r=this.glog(n[0])-this.glog(b.num[0]);for(var i=0;i<b.num.length;i++)n[i]^=this.gexp(this.glog(b.num[i])+r);return this.polyMod({num:n.slice(1)},b);},polyMultiply:function(a,b){var n=new Array(a.num.length+b.num.length-1);for(var i=0;i<n.length;i++)n[i]=0;for(var i=0;i<a.num.length;i++)for(var j=0;j<b.num.length;j++)n[i+j]^=this.gexp(this.glog(a.num[i])+this.glog(b.num[j]));return{num:n};},EXP_TABLE:null,LOG_TABLE:null,gexp:function(n){if(!this.EXP_TABLE)this._initTables();while(n<0)n+=255;while(n>=256)n-=255;return this.EXP_TABLE[n];},glog:function(n){if(!this.LOG_TABLE)this._initTables();if(n<1)throw new Error('glog('+n+')');return this.LOG_TABLE[n];},_initTables:function(){this.EXP_TABLE=new Array(256);this.LOG_TABLE=new Array(256);for(var i=0;i<8;i++)this.EXP_TABLE[i]=1<<i;for(var i=8;i<256;i++)this.EXP_TABLE[i]=this.EXP_TABLE[i-4]^this.EXP_TABLE[i-5]^this.EXP_TABLE[i-6]^this.EXP_TABLE[i-8];for(var i=0;i<255;i++)this.LOG_TABLE[this.EXP_TABLE[i]]=i;}};return QR;})();
-    function generateQR(text,canvas,size){var qr=new QRCode(6,1);qr.addData(text);qr.make();var ctx=canvas.getContext('2d');var mc=qr.getModuleCount(),cs=Math.floor(size/mc),as=cs*mc;canvas.width=as;canvas.height=as;ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,as,as);ctx.fillStyle='#0D0D0D';for(var r=0;r<mc;r++)for(var c=0;c<mc;c++)if(qr.isDark(r,c))ctx.fillRect(c*cs,r*cs,cs,cs);}
-    var sUrl=window.location.href;if(sUrl==='about:blank'||sUrl.startsWith('file://'))sUrl='https://audia-baudia.github.io/xteam-stakeholder/';
-    var c1=document.getElementById('qrStakeholder');if(c1)generateQR(sUrl,c1,200);
-    var c2=document.getElementById('qrXTeamPI');if(c2)generateQR('https://audia-baudia.github.io/xteam-project/',c2,200);
-})();
-</script>
+<!-- ── SCRIPTS ── -->
 
 <script>
     const observer=new IntersectionObserver((entries)=>{entries.forEach(entry=>{if(entry.isIntersecting)entry.target.classList.add('visible');});},{threshold:0.1,rootMargin:'0px 0px -50px 0px'});
@@ -654,19 +665,20 @@
 </script>
 <script>window.addEventListener('scroll',()=>{document.getElementById('topNav').classList.toggle('scrolled',window.scrollY>50);});</script>
 
-<!-- ── FORM SUBMISSION TO GOOGLE SHEETS ── -->
+<!-- ── FORM SUBMISSION TO FORMSPREE ── -->
 <script>
-    // ═══════════════════════════════════════════════════════
-    // Replace this URL with your Google Apps Script Web App URL
-    // ═══════════════════════════════════════════════════════
-    const GOOGLE_SHEETS_URL='YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
     document.getElementById('interestForm').addEventListener('submit',async function(e){
         e.preventDefault();
         const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Submitting...';
-        const fd=new FormData(this);const data=Object.fromEntries(fd.entries());
-        data.timestamp=new Date().toISOString();data.source='X-Team Stakeholder Presentation';
-        try{await fetch(GOOGLE_SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-        document.getElementById('interestForm').style.display='none';document.getElementById('formSuccess').style.display='block';
+        const fd=new FormData(this);
+        try{
+            const resp=await fetch('https://formspree.io/f/mreabayk',{method:'POST',body:fd,headers:{'Accept':'application/json'}});
+            if(resp.ok){
+                document.getElementById('interestForm').style.display='none';
+                document.getElementById('formSuccess').style.display='block';
+            }else{
+                throw new Error('Form submission failed');
+            }
         }catch(err){btn.disabled=false;btn.textContent='Submit Interest';alert('Something went wrong. Please try again.');}
     });
 </script>
